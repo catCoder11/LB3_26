@@ -1,0 +1,52 @@
+name: 'C++ CI'
+
+on:
+  push:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configure Linux Release
+        run: cmake --preset linux-release
+      - name: Build Linux Release
+        run: cmake --build --preset linux-release
+      - name: Test Linux
+        run: ctest --test-dir build/linux-release --output-on-failure
+      - name: Run Linux Release
+        run: ./build/linux-release/main
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: build/linux-release/main
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure Windows Release
+        run: cmake --preset windows-release
+      - name: Build Windows Release
+        run: cmake --build --preset windows-release
+      - name: Test Linux
+        run: ctest --test-dir build/linux-release --output-on-failure
+      - name: Run Windows Release
+        shell: cmd
+        run: build\windows-release\main.exe
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: build/windows-release/main.exe
