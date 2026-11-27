@@ -124,12 +124,12 @@ public:
 
     // обращение к элементу по индексу
     const T& operator[](size_t index) const {
-        if (index < 0 || index >= size_) throw std::out_of_range("Выход за пределы вектора");
+        if (index < 0 || index >= size_) throw std::out_of_range("out of range");
         return data_[index];
     }
 
     T& operator[](size_t index) {
-        if (index < 0 || index >= size_) throw std::out_of_range("Выход за пределы вектора");
+        if (index < 0 || index >= size_) throw std::out_of_range("out of range");
         return data_[index];
     }
 
@@ -166,9 +166,9 @@ public:
 
     T pop_back() {
         if (empty()) throw std::out_of_range("Vector::pop_back(): vector is empty");
-        size_--;
-        T el = std::move(*end());
-        end()->~T();
+        T el = std::move(data_[size_ - 1]);
+        data_[size_ - 1].~T();
+        --size_;
         return el;
     }
 
