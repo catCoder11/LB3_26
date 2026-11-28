@@ -279,3 +279,61 @@ TEST(Concepts, IteratorCategory) {
     static_assert(std::random_access_iterator<VectorIterator<int>>);
     SUCCEED();
 }
+
+// const begin/end: обход константного вектора по порядку
+TEST(ConstIterator, Traversal) {
+    const Vector<int> v = {1, 2, 3};
+    int expected = 1;
+    for (auto it = v.begin(); it != v.end(); ++it) EXPECT_EQ(*it, expected++);
+    EXPECT_EQ(expected, 4);
+}
+
+// range-based for по константному вектору
+TEST(ConstIterator, RangeFor) {
+    const Vector<int> v = {1, 2, 3};
+    int sum = 0;
+    for (int x : v) sum += x;
+    EXPECT_EQ(sum, 6);
+}
+
+// begin == end у пустого константного вектора
+TEST(ConstIterator, EmptyRange) {
+    const Vector<int> v;
+    EXPECT_TRUE(v.begin() == v.end());
+}
+
+// через const-итератор нельзя изменить элемент: тип результата разыменования const
+TEST(ConstIterator, ReadOnly) {
+    const Vector<int> v = {1, 2, 3};
+    using Ref = decltype(*v.begin());
+    static_assert(std::is_const_v<std::remove_reference_t<Ref>>);
+    SUCCEED();
+}
+
+// арифметика const-итератора: индекс, сдвиг, разность
+TEST(ConstIterator, Operations) {
+    const Vector<int> v = {10, 20, 30, 40};
+    auto it = v.begin();
+    EXPECT_EQ(it[2], 30);
+    EXPECT_EQ(*(it + 3), 40);
+    it += 2;
+    EXPECT_EQ(*it, 30);
+    --it;
+    EXPECT_EQ(*it, 20);
+    EXPECT_EQ(v.end() - v.begin(), 4);
+}
+
+// std::find и std::distance работают с const-итераторами
+TEST(ConstIterator, Algorithms) {
+    const Vector<int> v = {1, 2, 3};
+    auto it = std::find(v.begin(), v.end(), 2);
+    EXPECT_NE(it, v.end());
+    EXPECT_EQ(std::distance(v.begin(), it), 1);
+    EXPECT_EQ(std::find(v.begin(), v.end(), 99), v.end());
+}
+
+// const-итератор соответствует требованиям random access итератора C++20
+TEST(ConstIterator, Category) {
+    static_assert(std::random_access_iterator<VectorIterator<const int>>);
+    SUCCEED();
+}

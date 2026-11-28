@@ -31,6 +31,7 @@ private:
     std::size_t capacity_;
 public:
     using iterator = VectorIterator<T>;
+    using const_iterator = VectorIterator<const T>;
 
     // конструкторы //
 
@@ -218,8 +219,9 @@ public:
     const T& back() const {return data_[size_-1];}
     
     iterator begin() {return iterator(data_);}
-
     iterator end() {return iterator(data_)+size_;}
+    const_iterator begin() const { return const_iterator(data_); }
+    const_iterator end()   const { return const_iterator(data_ + size_); }
 };
 
 
